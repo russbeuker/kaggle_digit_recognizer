@@ -49,32 +49,32 @@ def augment_images(x_train=None, y_train=None, multiplier=2):
                        iaa.Sequential(
                             [
                                 iaa.Affine(scale={"x": (0.8, 1.2), "y": (0.8, 1.2)}),
-                                # iaa.Affine(rotate=(0.5, 1.5)),
-                                # iaa.CropAndPad(percent=(-0.25, 0.25))
+                                iaa.Affine(rotate=(0.5, 1.5)),
+                                iaa.CropAndPad(percent=(-0.25, 0.25))
                             ]
                         ),
                         iaa.Sequential(
                             [
                                 iaa.Affine(scale={"x": (0.8, 1.2), "y": (0.8, 1.2)}),
-                                # iaa.Affine(rotate=(0.5, 1.5)),
-                                # iaa.CropAndPad(percent=(-0.25, 0.25)),
-                                # iaa.Sharpen(alpha=(0.0, 1.0), lightness=(0.75, 2.0))
+                                iaa.Affine(rotate=(0.5, 1.5)),
+                                iaa.CropAndPad(percent=(-0.25, 0.25)),
+                                iaa.Sharpen(alpha=(0.0, 1.0), lightness=(0.75, 2.0))
                             ]
                         ),
                         iaa.Sequential(
                             [
                                 iaa.CoarseDropout(0.10, size_percent=0.33),
-                                # iaa.Affine(scale={"x": (0.8, 1.2), "y": (0.8, 1.2)}),
-                                # iaa.Affine(rotate=(0.5, 1.5)),
-                                # iaa.CropAndPad(percent=(-0.25, 0.25))
+                                iaa.Affine(scale={"x": (0.8, 1.2), "y": (0.8, 1.2)}),
+                                iaa.Affine(rotate=(0.5, 1.5)),
+                                iaa.CropAndPad(percent=(-0.25, 0.25))
                             ]
                         )
                 ])
     train_inflated = x_train_inflated.reshape(x_train_inflated.shape[0], 28, 28, 1)
     x_train_aug = seq.augment_images(train_inflated)
     # insert the original 60k images and labels at the beginning
-    x_train_aug = x_train_aug.reshape(x_train.shape[0], 784)
-    x_train = np.concatenate((x_train, x_train_aug), axis=0)
+    x_train_augx = x_train_aug.reshape(x_train_aug.shape[0], 784)
+    x_train = np.concatenate((x_train, x_train_augx), axis=0)
     y_train = np.concatenate((y_train, y_train_inflated), axis=0)
     logmsg('Augmention complete.')
 
@@ -116,11 +116,11 @@ def load_data_kaggle(augment=False, augment_multiplier=2, load_from_file=False):
         mnist_train_dataset = pd.read_csv(train_file, delimiter=',').values
         y_train = mnist_train_dataset[:,0]
         x_train = mnist_train_dataset[0:,1:]
+        x_train = x_train.astype('float32')
+        x_train /= 255
         if augment:
             x_train, y_train = augment_images(x_train, y_train, augment_multiplier)
         y_train = np_utils.to_categorical(y_train, 10)
-        x_train = x_train.astype('float32')
-        x_train /= 255
         y_test = None
         return x_train, y_train, x_test, y_test
 
@@ -247,7 +247,7 @@ def main():
     save_model=True
 
     logmsg('-- LOADING DATA ------------------------')
-    x_train, y_train, x_test, y_test = load_data_kaggle(augment=True, augment_multiplier=10, load_from_file=True)
+    x_train, y_train, x_test, y_test = load_data_kaggle(augment=True, augment_multiplier=6, load_from_file=True)
     logmsg(f'We will train the model with {x_train.shape[0]} images, and later test the model with {x_test.shape[0]} images.')
 
     logmsg('')
