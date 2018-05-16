@@ -183,38 +183,7 @@ def train(session_name='test1', metric='val_acc', use_history=False, iterations=
             rn.seed(random_seed)
             tf.set_random_seed(random_seed)
 
-        y_test = None
-        #  create model
-        #
-        # model = Sequential()
-        # model.add(Dense(1500, activation='relu', input_shape=(784,), kernel_initializer='he_normal'))
-        # model.add(Dropout(0.5))
-        # # model.add(BatchNormalization())
-        # model.add(Dense(1500, activation='relu', kernel_initializer='he_normal'))
-        # model.add(Dropout(0.5))
-        # # model.add(BatchNormalization())
-        # model.add(Dense(10, activation='softmax', kernel_initializer='he_normal'))
-        # model.compile(loss='categorical_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
-
         input_shape = (28, 28, 1)
-
-        # model = Sequential()
-        # model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=input_shape,
-        #                  kernel_initializer='he_normal'))
-        # model.add(Dropout(0.25))
-        # model.add(MaxPooling2D(pool_size=(2, 2)))
-        # model.add(Conv2D(64, (3, 3), activation='relu', kernel_initializer='he_normal'))
-        # model.add(Dropout(0.25))
-        # model.add(MaxPooling2D(pool_size=(2, 2)))
-        # model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', kernel_initializer='he_normal'))
-        # model.add(Dropout(0.25))
-        # model.add(MaxPooling2D(pool_size=(2, 2)))
-        # model.add(Flatten())
-        # model.add(Dense(256, activation='relu', kernel_initializer='he_normal'))
-        # model.add(Dropout(0.2))
-        # model.add(BatchNormalization())
-        # model.add(Dense(10, activation='softmax', kernel_initializer='he_normal'))
-        # model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
         model = Sequential()
 
