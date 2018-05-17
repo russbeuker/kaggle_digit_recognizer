@@ -235,7 +235,7 @@ def train(session_name='test1', metric='val_acc', use_history=False, iterations=
         font2 = {'family': 'serif', 'color': 'darkred', 'weight': 'normal', 'size': 10, }
         xindent = 1
         yindent = 0.55
-        plt.xlim(0.0, epochs - 1.0)
+        plt.xlim(0.0, results['final_epoch'] + 3.0)
         plt.ylim(0.0, 1.0)
         plt.plot(results['history']['acc'])
         plt.plot(results['history']['val_acc'])
