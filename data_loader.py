@@ -1,8 +1,9 @@
-from sklearn.model_selection import train_test_split
-from keras.utils import np_utils
-from keras.datasets import mnist
-from pandas import read_csv
 import numpy as np
+from keras.datasets import mnist
+from keras.utils import np_utils
+from pandas import read_csv
+from sklearn.model_selection import train_test_split
+
 
 # convert the kaggle data csv's to faster .npy
 def convert_kaggle_csv_to_pnp():
@@ -25,13 +26,13 @@ def convert_kaggle_csv_to_pnp():
 
 
 # loads and returns the keras mnist data as npy
-def load_keras_mnist_data(sess:None):
+def load_keras_mnist_data(sess: None):
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
     x_train = x_train.reshape(60000, 784)
     x_test = x_test.reshape(10000, 784)
     random_seed = np.random.seed(2)
     x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, test_size=0.1, random_state=random_seed,
-        stratify=y_train)
+                                                      stratify=y_train)
     x_train = x_train.astype('float32')
     x_val = x_val.astype('float32')
     x_test = x_test.astype('float32')
@@ -48,8 +49,9 @@ def load_keras_mnist_data(sess:None):
     y_val = np_utils.to_categorical(y_val, 10)
     return x_train, y_train, x_val, y_val, x_test, y_test
 
+
 # loads and returns the kaggle data as npy
-def load_kaggle_mnist_data(sess:None, edition: 0, use_clean: False):
+def load_kaggle_mnist_data(sess: None, edition: 0, use_clean: False):
     sess.log('Loading data.')
     if edition == 0:
         if use_clean:
@@ -67,15 +69,12 @@ def load_kaggle_mnist_data(sess:None, edition: 0, use_clean: False):
     x_train = np.load(file=xfile)
     y_train = np.load(file=yfile)
 
-
     # remove bad data from the train dataset
-
-
 
     # split into train and validation with stratification
     random_seed = np.random.seed(2)
     x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, test_size=0.1, random_state=random_seed,
-                                                     stratify=y_train)
+                                                      stratify=y_train)
     # set datatypes to float32 and normalize
     x_train = x_train.astype('float32')
     x_train /= 255

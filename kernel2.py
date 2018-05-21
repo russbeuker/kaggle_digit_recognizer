@@ -1,18 +1,18 @@
 # custom
-import globals
-from data_loader import load_keras_mnist_data, load_kaggle_mnist_data
-from utils import logmsg, delete_log_file
-from models import create_model_1
-from predictions import predict
-from sessions import TrainingSession
+import datetime
+import random as rn
 
 # native
 import numpy as np
 import tensorflow as tf
 from keras import backend as K
-import random as rn
-import datetime
 from kerasbestfit import kbf
+
+from data_loader import load_keras_mnist_data, load_kaggle_mnist_data
+from models import create_model_1
+from predictions import predict
+from sessions import TrainingSession
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 def train(session=None, metric='val_acc', iterations=1, epochs=2, patience=20,
@@ -20,15 +20,15 @@ def train(session=None, metric='val_acc', iterations=1, epochs=2, patience=20,
           shuffle=False, validation_split=0.0, save_best=False, save_path='',
           show_progress=True, format_metric_val='{:1.10f}', max_duration_mins=0, logmsg_callback=None,
           lock_random_seeds=True, random_seed=1, progress_callback=None):
-
     # init the bestsofar metric
-    if metric=='val_acc':
+    if metric == 'val_acc':
         best_metric_val_so_far = 0.0
-    elif metric=='val_loss':
+    elif metric == 'val_loss':
         best_metric_val_so_far = 100.0
     sbest_metric_val_so_far = metric + '=' + format_metric_val.format(best_metric_val_so_far)
 
-    session.log(f'Training {iterations} iterations with {x_train.shape[0]} images. Starting with best {sbest_metric_val_so_far}.')
+    session.log(
+        f'Training {iterations} iterations with {x_train.shape[0]} images. Starting with best {sbest_metric_val_so_far}.')
 
     # init timed session
     fmt = "%a %b %d %H:%M:%S"
@@ -46,10 +46,6 @@ def train(session=None, metric='val_acc', iterations=1, epochs=2, patience=20,
         rn.seed(random_seed)
         tf.set_random_seed(random_seed)
 
-
-
-
-
     iter_best_fit = 0
     for xtr in range(0, iterations):
         K.clear_session()
@@ -63,20 +59,24 @@ def train(session=None, metric='val_acc', iterations=1, epochs=2, patience=20,
         session.log(f'Iteration {xtr} of {iterations}.  Best {sbest_metric_val_so_far}')
 
         results, log = kbf.find_best_fit(model=model, metric=metric, xtrain=x_train, ytrain=y_train, xval=x_val,
-            yval=y_val, shuffle=shuffle, validation_split=validation_split, batch_size=batch_size, epochs=epochs,
-            patience=patience, snifftest_max_epoch=snifftest_max_epoch, snifftest_metric_val=snifftest_metric_val,
-            show_progress=show_progress, format_metric_val=format_metric_val, save_best=save_best,
-            save_path=save_path, best_metric_val_so_far=best_metric_val_so_far, finish_by=finish_by,
-            logmsg_callback=logmsg_callback, progress_callback=progress_callback
-            )
+                                         yval=y_val, shuffle=shuffle, validation_split=validation_split,
+                                         batch_size=batch_size, epochs=epochs,
+                                         patience=patience, snifftest_max_epoch=snifftest_max_epoch,
+                                         snifftest_metric_val=snifftest_metric_val,
+                                         show_progress=show_progress, format_metric_val=format_metric_val,
+                                         save_best=save_best,
+                                         save_path=save_path, best_metric_val_so_far=best_metric_val_so_far,
+                                         finish_by=finish_by,
+                                         logmsg_callback=logmsg_callback, progress_callback=progress_callback
+                                         )
 
         del model
 
         # notify if we found a new best metric val
-        is_best=False
-        if metric=='val_acc':
+        is_best = False
+        if metric == 'val_acc':
             is_best = results['best_metric_val'] > best_metric_val_so_far
-        elif metric=='val_loss':
+        elif metric == 'val_loss':
             is_best = results['best_metric_val'] < best_metric_val_so_far
         if is_best:
             iter_best_fit = xtr
@@ -96,12 +96,11 @@ def train(session=None, metric='val_acc', iterations=1, epochs=2, patience=20,
     session.log('')
 
 
-
-
 def on_progress(epoch, acc, loss, val_acc, val_loss):
     # print(epoch, acc, loss, val_acc, val_loss)
     # save this to disk so other app can display graph
     return
+
 
 def main():
     # create session
@@ -114,16 +113,16 @@ def main():
     sess.log(f'Training model with {x_train.shape[0]} images.  Testing the model with {x_test.shape[0]} images.')
 
     sess.log('-- TRAINING  ------------------------')
-    train(session=sess, metric='val_loss',  x_train=x_train, y_train=y_train, x_val=x_val, y_val=y_val, shuffle=False,
+    train(session=sess, metric='val_loss', x_train=x_train, y_train=y_train, x_val=x_val, y_val=y_val, shuffle=False,
           validation_split=0, save_best=True, save_path=sess.full_path, show_progress=True,
           format_metric_val='{:1.10f}', logmsg_callback=sess.log, progress_callback=on_progress,
-          max_duration_mins = 480,
-          iterations = 1,
-          epochs = 2,
-          patience = 20,
-          snifftest_max_epoch = 0,
-          snifftest_metric_val = 100.0
-    )
+          max_duration_mins=480,
+          iterations=1,
+          epochs=2,
+          patience=20,
+          snifftest_max_epoch=0,
+          snifftest_metric_val=100.0
+          )
 
     sess.log('-- PREDICTING KAGGLE ------------------------')
     predict(sess, x=x_test, y=y_test)
@@ -133,6 +132,7 @@ def main():
     predict(sess, x=x_test, y=y_test)
 
     sess.log('-- END ------------------------')
+
 
 if __name__ == "__main__":
     main()

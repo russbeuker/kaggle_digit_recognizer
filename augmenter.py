@@ -1,13 +1,16 @@
 import warnings
+
 warnings.simplefilter(action='ignore', category=FutureWarning)
 warnings.simplefilter(action='ignore', category=Warning)
 from imgaug import augmenters as iaa
 import os
 import numpy as np
+
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 x_train_file_npy = ".//input//x_train.npy"
 y_train_file_npy = ".//input//y_train.npy"
 x_test_file_npy = ".//input//x_test.npy"
+
 
 def augment_images(x_train=None, y_train=None, augs=2):
     # images must be provided in 28,28,1 and unit8, labels as uint8
@@ -88,6 +91,3 @@ def gen_augmentations():
         y_train = np.load(file=y_train_file_npy)
         x_train = x_train.reshape(x_train.shape[0], 28, 28, 1)
         x_train, y_train = augment_images(x_train=x_train, y_train=y_train, augs=x)
-
-
-

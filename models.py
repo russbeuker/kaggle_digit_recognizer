@@ -1,8 +1,8 @@
-from keras.models import Sequential, model_from_json, Model
-from keras.utils import plot_model
-from keras.models import Model
-from keras.layers import Dense, Dropout, MaxPooling2D, Flatten, BatchNormalization, Activation, Input, GlobalAveragePooling2D
+from keras.layers import Dense, Dropout, MaxPooling2D, Flatten, Activation, Input
 from keras.layers.convolutional import Conv2D
+from keras.models import Model
+from keras.models import model_from_json
+
 
 def load_model(session=None):
     # load the saved model and weights
@@ -10,6 +10,7 @@ def load_model(session=None):
         modelx = model_from_json(f.read())
     modelx.load_weights(session.full_path + 'model.hdf5')
     return modelx
+
 
 def create_model_1():
     dropout = 0.50

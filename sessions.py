@@ -1,8 +1,9 @@
 import os
 from datetime import datetime
+from os import rename
 from shutil import rmtree
 from uuid import uuid4
-from os import mkdir, rmdir, rename
+
 
 class TrainingSession():
     def __init__(self, name=None, parent_dir=None, log_mode='screen', timestamped_folder=False):
@@ -37,4 +38,3 @@ class TrainingSession():
                 myfile.write(f'{s}\n')
         if self.log_mode == 'screen_only' or self.log_mode == 'both':
             print(s)
-

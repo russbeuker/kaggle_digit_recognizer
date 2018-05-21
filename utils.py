@@ -1,9 +1,10 @@
+import datetime
+import os
+import random as rn
+from pathlib import Path
+
 import globals
 
-import datetime
-import random as rn
-import os
-from pathlib import Path
 
 def logmsg(msg=''):
     fmt = "%H:%M:%S"
@@ -14,10 +15,12 @@ def logmsg(msg=''):
     if globals.log_mode == 'screen_only' or globals.log_mode == 'both':
         print(s)
 
+
 def delete_log_file():
     my_file = Path(globals.log_file)
     if my_file.is_file():
         os.remove(globals.log_file)
+
 
 # returns a random "one in val" result.  So for a 1 in 5 chance, pass val=5.
 def flip(val):
