@@ -15,6 +15,8 @@ test_file_csv = ".//input//test.csv"
 x_train_file_npy = ".//input//x_train.npy"
 y_train_file_npy = ".//input//y_train.npy"
 x_test_file_npy = ".//input//x_test.npy"
+x_train_cleaned_file_npy = ".//input//x_train_cleaned.npy"
+y_train_cleaned_file_npy = ".//input//y_train_cleaned.npy"
 
 # fuction that logs to the screen with a timestamp
 def logmsg(msg=''):
@@ -124,26 +126,42 @@ def gen_test_pngs():
         plot_mnist_digits_packed(x[i:i + perfile], y, title=f'test_{i}', max_length=perfile, filter=None, show=False, save=True, show_index=False)
     logmsg('Done.')
 
-def display_single_digit(index):
-    #load the mnist data.  In this example we already have it stored in .npy's
-    # data must be sent to the plotting function as shape(rows, 784), datatype=uint8, unnormalized(pixel range from 0 to 255)
-    xfile = './/input//x_train.npy'
-    yfile = './/input//y_train.npy'
-    x = np.load(file=xfile)
-    y = np.load(file=yfile)
-
+def display_single_digit(x, y, index):
     image = x[index].reshape([28, 28])
     label = y[index]
     plt.title('Sample: %d  Label: %d' % (index, label))
     plt.imshow(image, cmap=plt.get_cmap('gray_r'))
     plt.show()
 
+def remove_bad_images():
+    lst = [12817,                                                                                           #0's
+           60,191,2284,2316,5275,7389,19633,19979,24891,29296,32565,38191,38544,40339,41739,                #0's
+           4677,7527,9162,13471,16598,20891,27364,                                                          #0's
+           240,11593,11896,17966,25708,28560,33198,34477,36018,41492,                                       #0's
+           1383,6781,22478,23604,26171,26182,26411,18593,34862,36051,36241,36830,37544,                     #0's
+           456,2867,2872,5695,6697,9195,18319,19364,27034,29253,35620,                                      #0's
+           7610,12388,12560,14659,15219,18283,24122,31649,40214,40358,40653,                                #0's
+           6295,7396,15284,19880,20089,21423,25233,26366,26932,27422,31741,                                 #0's
+           8566,10920,23489,25069,28003,28851,30352,30362,35396,36984,39990,40675,40868,41229,              #0's
+           631,4226,9943,14914,15065,17300,18316,19399,20003,20018,23135,23732,29524,33641,40881, 41354     #0's
+           ]
+    xfile = './/input//x_train.npy'
+    yfile = './/input//y_train.npy'
+    x = np.load(file=xfile)
+    y = np.load(file=yfile)
+    print(x.shape, y.shape)
+    x_cleaned = np.delete(x, lst, 0)
+    y_cleaned = np.delete(y, lst, 0)
+    print(x_cleaned.shape, y_cleaned.shape)
+    np.save(x_train_cleaned_file_npy, x_cleaned)
+    np.save(y_train_cleaned_file_npy, y_cleaned)
 
 def main():
-    #convert_csv_to_npy     #we'll convert the csv's to numpy arrays for better data loading speed.  Csv's are slow.
+    # convert_csv_to_npy     #we'll convert the csv's to numpy arrays for better data loading speed.  Csv's are slow.
     # gen_train_pngs()
     # gen_test_pngs()
-    display_single_digit(35094)
+    # display_single_digit(35094)
+    # remove_bad_images()
 
 
 
