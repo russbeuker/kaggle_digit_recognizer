@@ -24,20 +24,6 @@ def logmsg(msg=''):
     s = f'{datetime.datetime.today().strftime(fmt)}: {msg}'
     print(s)
 
-
-def convert_csv_to_pnp():
-    mnist_train_dataset = pd.read_csv(train_file_csv, delimiter=',').values
-    y_train = mnist_train_dataset[:, 0]
-    y_train = y_train.astype('uint8')
-    x_train = mnist_train_dataset[0:, 1:]
-    x_train = x_train.astype('uint8')
-    mnist_test_dataset = pd.read_csv(test_file_csv, delimiter=',').values
-    x_test = mnist_test_dataset
-    x_test = x_test.astype('uint8')
-    np.save(x_train_file_npy, x_train)
-    np.save(y_train_file_npy, y_train)
-    np.save(x_test_file_npy, x_test)
-
 def display_mnist_digit(images, labels, num):
     image = images[num].reshape([28, 28])
     label = labels[num]
