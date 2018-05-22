@@ -6,9 +6,10 @@ from uuid import uuid4
 
 
 class TrainingSession():
-    def __init__(self, name=None, parent_dir=None, log_mode='screen', timestamped_folder=False):
+    def __init__(self, name=None, parent_dir=None, log_mode='screen', timestamped_folder=False, delete_folder=True):
         self.name = name
         self.parent_dir = parent_dir
+        self.delete_folder = delete_folder
         self.timestamped_folder = timestamped_folder
 
         if self.timestamped_folder:
@@ -19,16 +20,22 @@ class TrainingSession():
             self.full_path = self.parent_dir + self.name + '//'
 
         self.log_path = self.full_path + 'log.txt'
+        self.state_path = self.full_path + 'state.txt'
+        self.results_path = self.full_path + 'results.txt'
         self.log_mode = log_mode
         self.create_dir()
         self.log('Session created.')
 
     def create_dir(self):
-        if os.path.exists(self.full_path):
-            tmp_name = self.parent_dir + str(uuid4())
-            rename(self.full_path, tmp_name)
-            rmtree(tmp_name)
-        os.makedirs(self.full_path)
+        if self.delete_folder:
+            if os.path.exists(self.full_path):
+                tmp_name = self.parent_dir + str(uuid4())
+                rename(self.full_path, tmp_name)
+                rmtree(tmp_name)
+            os.makedirs(self.full_path)
+        else:
+            if not os.path.exists(self.full_path):
+                os.makedirs(self.full_path)
 
     def log(self, msg=''):
         fmt = "%H:%M:%S"

@@ -3,6 +3,7 @@ from keras.datasets import mnist
 from keras.utils import np_utils
 from pandas import read_csv
 from sklearn.model_selection import train_test_split
+from sessions import TrainingSession
 
 
 # convert the kaggle data csv's to faster .npy
@@ -30,9 +31,7 @@ def load_keras_mnist_data(sess: None):
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
     x_train = x_train.reshape(60000, 784)
     x_test = x_test.reshape(10000, 784)
-    random_seed = np.random.seed(2)
-    x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, test_size=0.1, random_state=random_seed,
-                                                      stratify=y_train)
+    x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, test_size=0.1, stratify=y_train)
     x_train = x_train.astype('float32')
     x_val = x_val.astype('float32')
     x_test = x_test.astype('float32')
@@ -51,15 +50,14 @@ def load_keras_mnist_data(sess: None):
 
 
 # loads and returns the kaggle data as npy
-def load_kaggle_mnist_data(sess: None, edition: 0, use_clean: False):
-    sess.log('Loading data.')
+def load_kaggle_mnist_data(sess: TrainingSession, edition: 0, use_clean: False):
     if edition == 0:
         if use_clean:
-            sess.log('Using cleaned training data.')
+            # sess.log('Using cleaned training data.')
             xfile = ".//input//x_train_cleaned.npy"
             yfile = ".//input//y_train_cleaned.npy"
         else:
-            sess.log('Using original training data.')
+            # sess.log('Using original training data.')
             xfile = './/input//x_train.npy'
             yfile = './/input//y_train.npy'
     else:

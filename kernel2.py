@@ -1,17 +1,133 @@
-# custom
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 import datetime
 import random as rn
-
-# native
+from scipy import arange
 import numpy as np
 import tensorflow as tf
 from keras import backend as K
 from kerasbestfit import kbf
-
 from data_loader import load_keras_mnist_data, load_kaggle_mnist_data
 from models import create_model_1
 from predictions import predict
 from sessions import TrainingSession
+from pathlib import Path
+import pandas as pd
+from pandas import DataFrame
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
+def on_progress(epoch, acc, loss, val_acc, val_loss):
+    # print(epoch, acc, loss, val_acc, val_loss)
+    # save this to disk so other app can display graph
+    return
+
+def walk(iterations=1, epochs=2, patience=2, metric='val_acc', format_metric_val='{:1.10f}',
+         snifftest_max_epoch=0, snifftest_metric_val=0.0
+         ):
+    # create session
+    session_name = 'test1'
+    session_parent_dir = f'.//sessions//'
+    sess = TrainingSession(session_name, session_parent_dir, log_mode='both', timestamped_folder=False, delete_folder=False)
+
+    best_metric_val_so_far = 0.0
+    if metric == 'val_loss':
+        best_metric_val_so_far = 100.0
+
+    # get the most recent state of the test
+    my_file = Path(sess.state_path)
+    if my_file.is_file():
+        df = pd.read_csv(sess.state_path)
+        starting_batchsize = int(df['BATCHSIZE'])
+        starting_dropout = float(df['DROPOUT'])
+        best_metric_val_so_far = float(df['BEST_METRIC_VAL_SO_FAR'])
+    else:
+        starting_batchsize = 1500
+        starting_dropout = 0.0
+
+    for batch_size in arange(starting_batchsize, 5500, 500):
+        for dropout in arange(starting_dropout, 0.90, 0.05):
+            sess.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
+            s = f'Trying: Batchsize={batch_size}, Dropout={dropout}'
+            sess.log(s)
+
+            # save state
+
+            sess.log('Saving state.')
+            state_log = []
+            state = {}
+            state['BATCHSIZE'] = batch_size
+            state['DROPOUT'] = dropout
+            state['BEST_METRIC_VAL_SO_FAR'] = best_metric_val_so_far
+            state_log.append(state)
+            df = DataFrame.from_records(state_log, columns=state.keys())
+            my_file = Path(sess.state_path)
+            if my_file.is_file():
+                os.remove(sess.state_path)
+            df.to_csv(sess.state_path, header=True)
+
+            avg_metric=0
+            iter_best_fit = 0
+            for xtr in range(0, iterations + 1):
+                K.clear_session()
+                x_train, y_train, x_val, y_val, x_test, y_test = load_kaggle_mnist_data(sess, 0, True)
+                model = create_model_1(dropout=dropout)
+                sbest_metric_val_so_far = metric + '=' + format_metric_val.format(best_metric_val_so_far)
+                sess.log(f'Iteration {xtr} of {iterations}.  Best {sbest_metric_val_so_far}')
+                results, log = kbf.find_best_fit(model=model, metric=metric, xtrain=x_train, ytrain=y_train, xval=x_val,
+                                                 yval=y_val, validation_split=0,batch_size=batch_size, epochs=epochs,
+                                                 patience=patience, snifftest_max_epoch=snifftest_max_epoch,
+                                                 snifftest_metric_val=snifftest_metric_val,
+                                                 show_progress=True, format_metric_val=format_metric_val,
+                                                 save_best=True,
+                                                 save_path=sess.full_path,
+                                                 best_metric_val_so_far=best_metric_val_so_far,
+                                                 finish_by=0,
+                                                 logmsg_callback=sess.log, progress_callback=on_progress)
+
+                del model
+                avg_metric = avg_metric + results['best_metric_val']
+                # notify if we found a new best metric val
+                is_best = False
+                if metric == 'val_acc':
+                    is_best = results['best_metric_val'] > best_metric_val_so_far
+                elif metric == 'val_loss':
+                    is_best = results['best_metric_val'] < best_metric_val_so_far
+                if is_best:
+                    iter_best_fit = xtr
+                    best_metric_val_so_far = results['best_metric_val']
+                    sbest_metric_val_so_far = metric + '=' + format_metric_val.format(best_metric_val_so_far)
+                    sbest_epoch = results['best_epoch']
+                    s = f'NEW BEST: Batchsize={batch_size}, Dropout={dropout}, Iteration={iter_best_fit}, Result={sbest_metric_val_so_far}'
+                    sess.log(s)
+                sess.log('')
+            avg_val = (avg_metric / (iterations + 1))
+            sval = format_metric_val.format(avg_val)
+            sess.log(f'>>>> AVERAGE METRIC: {sval}')
+            sess.log('')
+
+            # save result
+            sess.log('Saving result.')
+            result_log = []
+            result = {}
+            result['BATCHSIZE'] = batch_size
+            result['DROPOUT'] = dropout
+            result['AVG_METRIC_VAL'] = avg_val
+            result_log.append(result)
+            df = DataFrame.from_records(result_log, columns=result.keys())
+            my_file = Path(sess.results_path)
+            if my_file.is_file():
+                df.to_csv(sess.results_path, mode='a', header=False)
+            else:
+                df.to_csv(sess.results_path)
+
+
+
+
+
+
+
+
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -96,13 +212,18 @@ def train(session=None, metric='val_acc', iterations=1, epochs=2, patience=20,
     session.log('')
 
 
-def on_progress(epoch, acc, loss, val_acc, val_loss):
-    # print(epoch, acc, loss, val_acc, val_loss)
-    # save this to disk so other app can display graph
-    return
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
 
 def main():
+    walk(iterations=2, epochs=2, patience=2, metric='val_acc', format_metric_val='{:1.10f}',
+         snifftest_max_epoch=0, snifftest_metric_val=0.0)
+
+    quit()
+
     # create session
     session_name = 'test1'
     session_parent_dir = f'.//sessions//'
@@ -132,7 +253,6 @@ def main():
     predict(sess, x=x_test, y=y_test)
 
     sess.log('-- END ------------------------')
-
 
 if __name__ == "__main__":
     main()

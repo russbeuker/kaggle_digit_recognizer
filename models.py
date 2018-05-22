@@ -12,8 +12,8 @@ def load_model(session=None):
     return modelx
 
 
-def create_model_1():
-    dropout = 0.50
+def create_model_1(dropout=0.5):
+
     input = Input(shape=(28, 28, 1))
 
     x1 = Conv2D(32, (5, 5), padding='same', kernel_initializer='he_normal')(input)

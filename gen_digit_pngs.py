@@ -109,7 +109,7 @@ def gen_test_pngs():
     logmsg('Generating a separate .png for each digit in x_test.')
     for i in range(0, x.shape[0], perfile):
         logmsg(str(i) + '...')
-        plot_mnist_digits_packed(x[i:i + perfile], y, title=f'test_{i}', max_length=perfile, filter=None, show=False, save=True, show_index=False)
+        plot_mnist_digits_packed(x[i:i + perfile], y, title=f'test_{i}', max_length=perfile, show=False, save=True, show_index=False)
     logmsg('Done.')
 
 def display_single_digit(x, y, index):
