@@ -42,17 +42,27 @@ def walk(iterations=1, epochs=2, patience=2, metric='val_acc', format_metric_val
         starting_dropout = float(df['DROPOUT'])
         best_metric_val_so_far = float(df['BEST_METRIC_VAL_SO_FAR'])
     else:
-        starting_batchsize = 1500
+        starting_batchsize = 100
         starting_dropout = 0.0
 
+    # starting_batchsize = 1500
     for batch_size in arange(starting_batchsize, 5500, 500):
-        for dropout in arange(starting_dropout, 0.90, 0.05):
+        starting_batchsize = 100
+
+        for dropout in arange(starting_dropout, 0.95, 0.05):
+
+            # note: resuming does not work.  You need to start it at a certain starting_batchsize and starting dropout, then reset it to 100, 0
+            # does the following 2 lines work?
+            starting_dropout = 0.0
+
             sess.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
             s = f'Trying: Batchsize={batch_size}, Dropout={dropout}'
             sess.log(s)
 
-            # save state
+            # print(batch_size, dropout)
+            # continue
 
+            # save state
             sess.log('Saving state.')
             state_log = []
             state = {}
@@ -131,7 +141,7 @@ def walk(iterations=1, epochs=2, patience=2, metric='val_acc', format_metric_val
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-def train(session=None, metric='val_acc', iterations=1, epochs=2, patience=20,
+def train(session=None, metric='val_acc', iterations=1, epochs=2, patience=5,
           snifftest_max_epoch=0, snifftest_metric_val=0.0, x_train=None, y_train=None, x_val=None, y_val=None,
           shuffle=False, validation_split=0.0, save_best=False, save_path='',
           show_progress=True, format_metric_val='{:1.10f}', max_duration_mins=0, logmsg_callback=None,
@@ -219,8 +229,8 @@ def train(session=None, metric='val_acc', iterations=1, epochs=2, patience=20,
 
 
 def main():
-    walk(iterations=2, epochs=2, patience=2, metric='val_acc', format_metric_val='{:1.10f}',
-         snifftest_max_epoch=0, snifftest_metric_val=0.0)
+    walk(iterations=3, epochs=200, patience=10, metric='val_acc', format_metric_val='{:1.10f}',
+         snifftest_max_epoch=0, snifftest_metric_val=0)
 
     quit()
 
