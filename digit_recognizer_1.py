@@ -40,6 +40,8 @@ model_path = ""
 # we'll also pass this function as a parameter to the kerasbestfit function later
 log_file = "log.txt"
 log_mode = 'both'
+# this is for formatting numbers in the log
+format_metric_val = '{:1.10f}'
 
 
 def log_msg(msg=''):
@@ -186,8 +188,6 @@ log_msg(f'y_val shape is {y_val.shape} of data type {y_val.dtype}.  These are ou
 do_training = True
 if do_training:
     log_msg('---- TRAINING BEGIN ----')
-    # this is for formatting numbers in the log
-    format_metric_val = '{:1.10f}'
 
     # set this metric to val_acc for accuracy, and val_loss for loss.  Running val_acc is fine for this competition.
     metric = 'val_acc'
@@ -279,20 +279,22 @@ if do_training:
     log_msg('---- TRAINING END ----')
 
 # generate plot or accuracy and loss
-plt.rcParams.update({'font.size': 16})
-plt.figure(figsize=(20,10))
-plt.xlim(0.0, best_epoch + 2.0)
-plt.ylim(0.0, 1.0)
-plt.plot(best_log['acc'])
-plt.plot(best_log['val_acc'])
-plt.plot(best_log['loss'])
-plt.plot(best_log['val_loss'])
-plt.axvline(results['best_epoch'], 0, 1, color='k', linestyle='--')
-plt.title(f'Best Result: {sbest_metric_val_so_far}')
-plt.ylabel('Loss')
-plt.xlabel('Epoch')
-plt.legend(['acc', 'val_acc', 'loss', 'val_loss'], loc='center right')
-plt.show()
+gen_plot = True
+if gen_plot:
+    plt.rcParams.update({'font.size': 16})
+    plt.figure(figsize=(20,10))
+    plt.xlim(0.0, best_epoch + 2.0)
+    plt.ylim(0.0, 1.0)
+    plt.plot(best_log['acc'])
+    plt.plot(best_log['val_acc'])
+    plt.plot(best_log['loss'])
+    plt.plot(best_log['val_loss'])
+    plt.axvline(results['best_epoch'], 0, 1, color='k', linestyle='--')
+    plt.title(f'Best Result: {sbest_metric_val_so_far}')
+    plt.ylabel('Loss')
+    plt.xlabel('Epoch')
+    plt.legend(['acc', 'val_acc', 'loss', 'val_loss'], loc='center right')
+    plt.show()
 
 # load saved model
 with open('.//model.json', 'r') as f:
